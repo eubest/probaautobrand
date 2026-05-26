@@ -40,7 +40,7 @@ Ordinea recomandata de citire:
 
 - Next.js App Router, TypeScript, Tailwind CSS
 - componente shadcn UI
-- Prisma + SQLite pentru baza de date locala
+- Prisma + Postgres pentru baza de date locala si de productie
 - Cheerio + `fetch` pentru scraper
 - feed XML BNR pentru cursul valutar
 - `pdf-parse` pentru text din PDF
@@ -109,16 +109,16 @@ SCRAPE_PASSWORD
 SCRAPE_PRICE_CURRENCY
 ```
 
-SQLite este pastrata pentru review local si demo rapid. Pentru o implementare Vercel persistenta, foloseste o baza de date SQL gazduita, cum ar fi Neon sau Vercel Postgres, si schimba provider-ul Prisma pe `postgresql` in branch-ul de productie.
+Aplicatia foloseste Postgres si pe local, si pe Vercel. In productie, conecteaza `DATABASE_URL` la Neon sau Vercel Postgres si, daca ai nevoie de migrari separate, foloseste si `DIRECT_URL` pentru conexiunea nepoolata.
 
 Fluxul de deploy:
 
-1. Creezi o baza de date Postgres gazduita.
-1. Actualizezi `prisma/schema.prisma` sa foloseasca `provider = "postgresql"` pentru versiunea de productie.
-1. Rulezi `npm run db:push` sau fluxul tau de migratii Prisma peste acea baza de date.
+1. Creezi sau conectezi baza de date Postgres gazduita.
+1. Pastrezi `provider = "postgresql"` in `prisma/schema.prisma`.
+1. Rulezi `npm run db:push` peste baza de date aleasa.
 1. Impingi repository-ul pe GitHub.
 1. Importi repo-ul in Vercel.
-1. Adaugi variabilele de mediu de mai sus in proiectul Vercel.
+1. Adaugi variabilele de mediu de mai sus in proiectul Vercel, inclusiv `DIRECT_URL` daca folosesti migrari separate.
 1. Faci deploy si verifici aplicatia in `/login` si `/`.
 1. Rulezi butonul de scrape manual o data, apoi verifici ruta de cron in log-urile Vercel in fereastra 12:00-18:00, ora Europe/Bucharest.
 
@@ -130,7 +130,8 @@ Cerintele cer parsarea PDF-ului si asta este implementat. Pentru o integrare rea
 
 Inainte de deploy, verifica:
 
-1. `DATABASE_URL` pointeaza spre o baza de date SQL reala, gazduita.
+1. `DATABASE_URL` pointeaza spre o baza de date Postgres reala, gazduita.
+1. `DIRECT_URL` exista daca ai nevoie de conexiune nepoolata pentru migrari.
 1. `APP_USERNAME`, `APP_PASSWORD` si `AUTH_SECRET` sunt configurate.
 1. `SCRAPE_USERNAME`, `SCRAPE_PASSWORD` si `SCRAPE_PRICE_CURRENCY` sunt configurate.
 1. `CRON_SECRET` este setat, ca ruta de cron sa nu ramana deschisa in productie.
