@@ -1,54 +1,54 @@
-# Autobrand Practical Assignment
+# Autobrand - Proba practica
 
-Next.js + shadcn dashboard for the Autobrand practical test:
+Dashboard Next.js + shadcn pentru proba practica Autobrand.
 
-- logs in to `web-scraping.dev`
-- scrapes all consumables products across pagination
-- stores products in SQL with a unique product-name constraint
-- enriches scraped prices with the BNR exchange rate and RON value
-- exposes edit/delete/filter/sort controls
-- uploads the supplied eFactura PDF, also accepts e-Factura XML as a production-minded extra, and can either return CSV immediately or store imports in SQL
-- previews stored invoice rows in a shadcn table and downloads saved CSV data back from the database
-- includes a cron-ready endpoint for hourly scraping between 12:00 and 18:00 Europe/Bucharest
-- protects the app with simple signed-cookie authentication
-- uses Romanian as the default interface language, with a Romanian/English toggle saved in a cookie
+- se autentifica in `web-scraping.dev`
+- extrage toate produsele din categoria consumables, cu paginare
+- salveaza produsele in SQL cu unicitate dupa denumire
+- imbogateste preturile cu cursul BNR si valoarea in RON
+- ofera editare, stergere, filtrare si sortare
+- incarca PDF-ul eFactura primit, accepta si XML e-Factura ca extra de productie si poate fie sa returneze CSV direct, fie sa salveze importul in baza de date
+- afiseaza importurile salvate intr-un tabel shadcn si permite descarcarea CSV-ului din baza de date
+- include o ruta cron pregatita pentru rulare din ora in ora intre 12:00 si 18:00, ora Europe/Bucharest
+- protejeaza aplicatia cu autentificare simpla, pe baza de cookie semnat
+- foloseste romana ca limba implicita, cu toggle romana/engleza salvat in cookie
 
-## Project Map
+## Harta proiectului
 
-Start here if you want to understand the code quickly:
+Daca vrei sa intelegi rapid unde este fiecare lucru, incepe de aici:
 
-- `src/app/page.tsx`: server-side dashboard entrypoint, data loading, and composition.
-- `src/components/dashboard/*`: the dashboard is split into header, stats, invoice panel, and product table pieces.
-- `src/lib/dashboard.ts`: shared dashboard helpers, types, sort logic, date/number formatting, and query-string helpers.
-- `src/lib/scraper.ts`: login, pagination, product parsing, unique-product persistence, and BNR enrichment.
-- `src/lib/invoice-pdf.ts`: PDF parsing, optional XML parsing, metadata extraction, and CSV generation.
-- `src/app/actions.ts`: server actions for scrape, edit/delete, and invoice import.
-- `src/app/api/*`: direct invoice CSV download, stored invoice download, and cron scraping.
-- `prisma/schema.prisma`: the SQL data model for products, scrape runs, invoice imports, and invoice rows.
-- `scripts/verify-invoice-parser.ts`: parser verification against the supplied PDF and a sample XML invoice.
+- `src/app/page.tsx`: punctul de intrare al dashboard-ului, incarcarea datelor si compunerea paginii.
+- `src/components/dashboard/*`: header, statistici, panou pentru facturi si tabelul de produse sunt separate in componente mici.
+- `src/lib/dashboard.ts`: helper-ele comune pentru dashboard, tipuri, sortare, formatare data/numar si query string-uri.
+- `src/lib/scraper.ts`: login, paginare, parsarea produselor, persistenta produselor unice si imbogatirea cu curs BNR.
+- `src/lib/invoice-pdf.ts`: parsare PDF, parsare XML optionala, extragere metadata si generare CSV.
+- `src/app/actions.ts`: server actions pentru scrape, editare/stergere si importul facturii.
+- `src/app/api/*`: export CSV direct, export CSV din date salvate si ruta de cron.
+- `prisma/schema.prisma`: modelul SQL pentru produse, rule de scrape, importuri de facturi si randuri factura.
+- `scripts/verify-invoice-parser.ts`: verificare a parserului pe PDF-ul primit si pe un XML de test.
 
-Recommended reading order:
+Ordinea recomandata de citire:
 
 1. `README.md`
-2. `src/app/page.tsx`
-3. `src/components/dashboard/DashboardPage.tsx`
-4. `src/lib/dashboard.ts`
-5. `src/lib/scraper.ts`
-6. `src/lib/invoice-pdf.ts`
+1. `src/app/page.tsx`
+1. `src/components/dashboard/DashboardPage.tsx`
+1. `src/lib/dashboard.ts`
+1. `src/lib/scraper.ts`
+1. `src/lib/invoice-pdf.ts`
 
-## Tech Stack
+## Tehnologii
 
 - Next.js App Router, TypeScript, Tailwind CSS
-- shadcn UI components
-- Prisma + SQLite for a self-contained local SQL database
-- Cheerio + `fetch` for the scraper
-- BNR XML feed for exchange rates
-- `pdf-parse` for PDF text extraction
-- `fast-xml-parser` for BNR rates and optional e-Factura XML parsing
+- componente shadcn UI
+- Prisma + SQLite pentru baza de date locala
+- Cheerio + `fetch` pentru scraper
+- feed XML BNR pentru cursul valutar
+- `pdf-parse` pentru text din PDF
+- `fast-xml-parser` pentru cursuri BNR si parsare optionala XML e-Factura
 
-The scraper target uses a dollar price display but does not expose an ISO currency code, so `SCRAPE_PRICE_CURRENCY` defaults to `USD`. Change it in `.env` if you want a different source currency.
+Targetul de scraping afiseaza pretul cu simbol dolar, dar nu expune un cod ISO pentru moneda, asa ca `SCRAPE_PRICE_CURRENCY` are valoarea implicita `USD`. Schimba valoarea in `.env` daca vrei alta moneda sursa.
 
-## Local Setup
+## Setup local
 
 ```bash
 npm install
@@ -57,44 +57,44 @@ npm run db:push
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Deschide `http://localhost:3000`.
 
-Default local app credentials:
+Credentiale locale implicite:
 
 - username: `admin`
-- password: `autobrand`
+- parola: `autobrand`
 
-## Useful Commands
+## Comenzi utile
 
 ```bash
-npm run dev          # local app
-npm run build        # production build check
+npm run dev          # aplicatia locala
+npm run build        # verificare build productie
 npm run lint         # lint
-npm run typecheck    # TypeScript check
-npm run db:push      # sync Prisma schema to SQLite
-npm run verify:invoice # parse the supplied invoice PDF and assert the expected CSV row
+npm run typecheck    # verificare TypeScript
+npm run db:push      # sincronizeaza schema Prisma cu SQLite
+npm run verify:invoice # verifica parsarea PDF-ului primit si CSV-ul asteptat
 ```
 
-## Assignment Checklist
+## Lista cerinte
 
-- Web scraping + login: implemented in `src/lib/scraper.ts`.
-- SQL table and unique product names: `prisma/schema.prisma`, `Product.name @unique`.
-- Hourly cron route: `src/app/api/cron/scrape/route.ts`, configured by `vercel.json`.
-- Product UI: `src/app/page.tsx`.
-- Edit/delete article: `src/components/product-actions.tsx` and `src/app/actions.ts`.
-- Direct PDF to CSV download: `src/app/api/invoice/csv/route.ts` and the first invoice button in `src/app/page.tsx`.
-- Persisted PDF import: `src/lib/invoice-pdf.ts`, `scripts/verify-invoice-parser.ts`, and the second invoice button in `src/app/page.tsx`.
-- Stored invoice CSV download: `InvoiceImport` / `InvoiceItem` in `prisma/schema.prisma` and `src/app/api/invoice/imports/[id]/csv/route.ts`.
-- Review and RO e-Factura recommendation: `docs/assignment-review.md`.
-- Bonus exchange rate and RON price: `src/lib/exchange-rate.ts`.
-- Bonus filtering/sorting: dashboard query controls.
-- Bonus auth: signed HTTP-only cookie session in `src/lib/auth.ts`.
+- Web scraping + login: implementat in `src/lib/scraper.ts`.
+- Tabela SQL si unicitate dupa denumire: `prisma/schema.prisma`, `Product.name @unique`.
+- Cron din ora in ora: `src/app/api/cron/scrape/route.ts`, configurat prin `vercel.json`.
+- UI pentru produse: `src/app/page.tsx`.
+- Editare/stergere articol: `src/components/product-actions.tsx` si `src/app/actions.ts`.
+- Download PDF -> CSV direct: `src/app/api/invoice/csv/route.ts` si primul buton din `src/app/page.tsx`.
+- Import PDF salvat in baza de date: `src/lib/invoice-pdf.ts`, `scripts/verify-invoice-parser.ts` si al doilea buton din `src/app/page.tsx`.
+- Download CSV pentru importurile salvate: `InvoiceImport` / `InvoiceItem` in `prisma/schema.prisma` si `src/app/api/invoice/imports/[id]/csv/route.ts`.
+- Revizie si recomandare RO e-Factura: `docs/assignment-review.md`.
+- Bonus curs valutar si pret RON: `src/lib/exchange-rate.ts`.
+- Bonus filtrare si sortare: controalele din dashboard.
+- Bonus autentificare: sesiune semnata in cookie HTTP-only, in `src/lib/auth.ts`.
 
-## Vercel Notes
+## Vercel
 
-`vercel.json` calls `/api/cron/scrape` every hour. The route itself skips work outside 12:00-18:00 Europe/Bucharest, which avoids timezone surprises.
+`vercel.json` apeleaza `/api/cron/scrape` din ora in ora. Ruta verifica in plus fereastra 12:00-18:00, ora Europe/Bucharest, ca sa evite surprizele de timezone.
 
-For a deployed demo, set these environment variables in Vercel:
+Variabilele de mediu necesare in Vercel:
 
 ```bash
 DATABASE_URL
@@ -107,59 +107,59 @@ SCRAPE_PASSWORD
 SCRAPE_PRICE_CURRENCY
 ```
 
-SQLite is intentionally used for easy local review. For a persistent Vercel deployment, use a hosted SQL database such as Neon/Vercel Postgres and switch the Prisma datasource provider to `postgresql` before deploying.
+SQLite este pastrata pentru review local si demo rapid. Pentru o implementare Vercel persistenta, foloseste o baza de date SQL gazduita, cum ar fi Neon sau Vercel Postgres, si schimba provider-ul Prisma pe `postgresql` in branch-ul de productie.
 
-Deployment flow:
+Fluxul de deploy:
 
-1. Create a hosted Postgres database.
-1. Update `prisma/schema.prisma` to use `provider = "postgresql"` for the deployed branch.
-1. Run `npm run db:push` or your preferred Prisma migration flow against that hosted database.
-1. Push the repository to GitHub.
-1. Import the repo into Vercel.
-1. Add the environment variables above in the Vercel project settings.
-1. Deploy and verify the app at `/login` and `/`.
-1. Trigger the manual scrape button once, then verify the cron endpoint in Vercel logs later in the 12:00-18:00 Europe/Bucharest window.
+1. Creezi o baza de date Postgres gazduita.
+1. Actualizezi `prisma/schema.prisma` sa foloseasca `provider = "postgresql"` pentru versiunea de productie.
+1. Rulezi `npm run db:push` sau fluxul tau de migratii Prisma peste acea baza de date.
+1. Impingi repository-ul pe GitHub.
+1. Importi repo-ul in Vercel.
+1. Adaugi variabilele de mediu de mai sus in proiectul Vercel.
+1. Faci deploy si verifici aplicatia in `/login` si `/`.
+1. Rulezi butonul de scrape manual o data, apoi verifici ruta de cron in log-urile Vercel in fereastra 12:00-18:00, ora Europe/Bucharest.
 
-## RO e-Factura Recommendation
+## Recomandare RO e-Factura
 
-The assignment asks for PDF parsing, which is implemented. For a production RO e-Factura integration, the recommended source of truth is the XML document retrieved through the ANAF/SPV API; PDF should be treated as a visual/export format. This project includes optional XML parsing as an extra and documents the reasoning in `docs/assignment-review.md`.
+Cerintele cer parsarea PDF-ului si asta este implementat. Pentru o integrare reala RO e-Factura, sursa principala de adevar ar trebui sa fie XML-ul descarcat din ANAF/SPV; PDF-ul ar trebui tratat ca format de vizualizare/export. Proiectul include parsare XML optionala ca extra si explica decizia in `docs/assignment-review.md`.
 
-## Vercel Checklist
+## Checklist Vercel
 
-Before deploying, make sure these are set:
+Inainte de deploy, verifica:
 
-1. `DATABASE_URL` points to a real hosted SQL database.
-1. `APP_USERNAME`, `APP_PASSWORD`, and `AUTH_SECRET` are configured.
-1. `SCRAPE_USERNAME`, `SCRAPE_PASSWORD`, and `SCRAPE_PRICE_CURRENCY` are configured.
-1. `CRON_SECRET` is configured so the cron route is not open in production.
-1. The database has been initialized with `npm run db:push` against the chosen provider.
-1. `npm run build` passes locally before the first deploy.
+1. `DATABASE_URL` pointeaza spre o baza de date SQL reala, gazduita.
+1. `APP_USERNAME`, `APP_PASSWORD` si `AUTH_SECRET` sunt configurate.
+1. `SCRAPE_USERNAME`, `SCRAPE_PASSWORD` si `SCRAPE_PRICE_CURRENCY` sunt configurate.
+1. `CRON_SECRET` este setat, ca ruta de cron sa nu ramana deschisa in productie.
+1. Baza de date a fost initializata cu `npm run db:push` pe provider-ul ales.
+1. `npm run build` trece local inainte de primul deploy.
 
-The deployed cron runs hourly through `vercel.json`, while the route itself limits execution to 12:00-18:00 Europe/Bucharest.
+Cron-ul de productie ruleaza din `vercel.json`, iar ruta limiteaza executia la 12:00-18:00, ora Europe/Bucharest.
 
-## Sources In Code
+## Surse in cod
 
-If you want to trace any behavior back to the implementation, these are the main source files:
+Daca vrei sa urmaresti comportamentul in implementare, acestea sunt fisierele principale:
 
-- Scraping flow: `src/lib/scraper.ts`
-- Exchange rates: `src/lib/exchange-rate.ts`
-- Dashboard layout: `src/components/dashboard/DashboardPage.tsx`
-- Dashboard helpers: `src/lib/dashboard.ts`
-- Invoice parsing and CSV export: `src/lib/invoice-pdf.ts`
-- Invoice direct download route: `src/app/api/invoice/csv/route.ts`
-- Stored invoice download route: `src/app/api/invoice/imports/[id]/csv/route.ts`
-- Cron route: `src/app/api/cron/scrape/route.ts`
-- Database schema: `prisma/schema.prisma`
-- Review notes and recommendations: `docs/assignment-review.md`
+- fluxul de scraping: `src/lib/scraper.ts`
+- curs valutar: `src/lib/exchange-rate.ts`
+- layout dashboard: `src/components/dashboard/DashboardPage.tsx`
+- helper-e dashboard: `src/lib/dashboard.ts`
+- parsare factura si export CSV: `src/lib/invoice-pdf.ts`
+- ruta de download CSV direct: `src/app/api/invoice/csv/route.ts`
+- ruta de download CSV pentru importuri salvate: `src/app/api/invoice/imports/[id]/csv/route.ts`
+- ruta de cron: `src/app/api/cron/scrape/route.ts`
+- schema bazei de date: `prisma/schema.prisma`
+- notite si recomandari: `docs/assignment-review.md`
 
-## Verified Locally
+## Verificat local
 
 - `npm run typecheck`
 - `npm run lint`
 - `npm run verify:invoice`
 - `npm run build`
-- Cron scrape returned 16 scraped rows saved as 6 unique product names.
-- The provided `AD AUTO TOTAL...PDF` returned:
+- Cron scrape a returnat 16 randuri scrapate si 6 produse unice.
+- PDF-ul `AD AUTO TOTAL...PDF` a returnat:
 
 ```csv
 cod_produs,denumire_produs,pret_unitar,moneda,cantitate
