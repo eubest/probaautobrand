@@ -24,6 +24,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const dictionary = getDictionary(locale);
   const params = await searchParams;
   const nextPath = params.error ? "/login?error=invalid" : "/login";
+  const demoUsername = process.env.APP_USERNAME ?? "admin";
+  const demoPassword = process.env.APP_PASSWORD ?? "autobrand";
 
   if (session) {
     redirect("/");
@@ -58,11 +60,18 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <form action={loginAction} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="username">{dictionary.login.username}</Label>
-              <Input id="username" name="username" required autoComplete="username" defaultValue="admin" />
+              <Input id="username" name="username" required autoComplete="username" defaultValue={demoUsername} />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">{dictionary.login.password}</Label>
-              <Input id="password" name="password" required type="password" autoComplete="current-password" />
+              <Input
+                id="password"
+                name="password"
+                required
+                type="password"
+                autoComplete="current-password"
+                defaultValue={demoPassword}
+              />
             </div>
             <Button className="w-full" type="submit">
               <LockKeyhole />
