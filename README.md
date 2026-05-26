@@ -9,7 +9,7 @@ Dashboard Next.js + shadcn pentru proba practica Autobrand.
 - ofera editare, stergere, filtrare si sortare
 - incarca PDF-ul eFactura primit, accepta si XML e-Factura ca extra de productie si poate fie sa returneze CSV direct, fie sa salveze importul in baza de date
 - afiseaza importurile salvate intr-un tabel shadcn si permite descarcarea CSV-ului din baza de date
-- include o ruta cron pregatita pentru rulare din ora in ora intre 12:00 si 18:00, ora Europe/Bucharest
+- include o ruta cron pregatita pentru productie pe Vercel Hobby; cerinta orara originala este pastrata mai jos, comentata, din cauza limitei Vercel pentru cron jobs
 - protejeaza aplicatia cu autentificare simpla, pe baza de cookie semnat
 - foloseste romana ca limba implicita, cu toggle romana/engleza salvat in cookie
 
@@ -92,7 +92,9 @@ npm run verify:invoice # verifica parsarea PDF-ului primit si CSV-ul asteptat
 
 ## Vercel
 
-`vercel.json` apeleaza `/api/cron/scrape` din ora in ora. Ruta verifica in plus fereastra 12:00-18:00, ora Europe/Bucharest, ca sa evite surprizele de timezone.
+`vercel.json` apeleaza `/api/cron/scrape` zilnic, la 10:00 UTC. Ruta verifica in plus fereastra 12:00-18:00, ora Europe/Bucharest, ca sa evite surprizele de timezone.
+
+<!-- Cerinta originala din proba: cron din ora in ora intre 12:00 si 18:00, ora Europe/Bucharest. Pe Vercel Hobby aceasta setare este comentata in documentatie si inlocuita cu o rulare zilnica, pentru ca planul limita cron jobs la o executie pe zi. -->
 
 Variabilele de mediu necesare in Vercel:
 
@@ -135,7 +137,7 @@ Inainte de deploy, verifica:
 1. Baza de date a fost initializata cu `npm run db:push` pe provider-ul ales.
 1. `npm run build` trece local inainte de primul deploy.
 
-Cron-ul de productie ruleaza din `vercel.json`, iar ruta limiteaza executia la 12:00-18:00, ora Europe/Bucharest.
+Cron-ul de productie ruleaza zilnic din `vercel.json`, iar ruta limiteaza executia la 12:00-18:00, ora Europe/Bucharest. Daca treci pe Vercel Pro, poti readuce cron-ul orar cerut initial.
 
 ## Surse in cod
 

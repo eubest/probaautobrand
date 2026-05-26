@@ -8,7 +8,7 @@ Verificat la 2026-05-25.
 | --- | --- | --- | --- |
 | Autentificare pe `web-scraping.dev/login` | Acoperit | `src/lib/scraper.ts` foloseste acelasi flux HTTP pentru login si pagini de produse. | Pentru productie, as adauga test de contract pe HTML ca sa prindem schimbari de markup. |
 | Accesare `products?category=consumables` si extragere poza, denumire, pret, descriere | Acoperit | `scrapeConsumableProducts()` parcurge paginarea si extrage campurile cerute. Dry-run curent: 16 randuri, 6 denumiri unice. | Pretul de pe site foloseste simbol `$`, nu cod ISO; aplicatia documenteaza `SCRAPE_PRICE_CURRENCY=USD`. |
-| Cron din ora in ora intre 12:00 si 18:00 | Acoperit | `vercel.json` ruleaza hourly, iar ruta verifica fereastra Europe/Bucharest. | In Vercel trebuie setat `CRON_SECRET`; ruta refuza accesul nesecurizat in productie. |
+| Cron din ora in ora intre 12:00 si 18:00 | Partial in Hobby, complet pe Pro | In repo cerinta este implementata in ruta, dar `vercel.json` foloseste acum o rulare zilnica pentru a respecta limita Vercel Hobby. | In Vercel trebuie setat `CRON_SECRET`; daca treci pe Pro, poti reveni la hourly. |
 | Baza de date si unicitate dupa denumire | Acoperit | Prisma `Product.name @unique`, `upsert` dupa `name`. | Pentru deploy persistent, SQLite trebuie inlocuit cu Postgres/Neon/Vercel Postgres. |
 | Interfata web pentru afisare | Acoperit | Dashboard Next.js + shadcn table in `src/app/page.tsx`. | Ar ajuta un screenshot in README pentru evaluator. |
 | Editare articol | Acoperit | `ProductActions` + `updateProductAction`. | Validarea e buna; se poate adauga audit trail daca vrem bonus mai business. |
